@@ -9,14 +9,36 @@ import Header from '../components/header';
 import Footer from '../components/footer';
 import '../styles/globals.css';
 
+// Solana Pay Integration
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { clusterApiUrl } from '@solana/web3.js';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+
+require('@solana/wallet-adapter-react-ui/styles.css');
+
 function MyApp({ Component, pageProps }) {
-	return (
-		<ChakraProvider theme={theme}>
-			<Header />
-			<Component {...pageProps} />
-			<Footer />
-		</ChakraProvider>
-	);
+  const network = WalletAdapterNetwork.Devnet;
+  const endpoint = clusterApiUrl(network);
+  const wallets = [new PhantomWalletAdapter()];
+
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <ChakraProvider theme={theme}>
+            <Header />
+            <Component {...pageProps} />
+            <Footer />
+          </ChakraProvider>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  );
 }
 
 export default MyApp;
